@@ -153,7 +153,7 @@
     </div>
 
     <script>
-        // Configuration
+        // Configuration - Updated with correct client ID
         const GITHUB_CLIENT_ID = 'Iv23liZGafdIIpWCxyCD';
         const REPO_OWNER = 'redfox-studios';
         const REPO_NAME = 'redfox-studios.github.io';
@@ -161,52 +161,52 @@
     
         let auth = null;
     
-        // Parse the access token from URL hash if present
-        function parseHash() {
-            const hash = window.location.hash.substring(1);
-            const params = new URLSearchParams(hash);
+        // Debug function
+        function debug(message, data = null) {
+            const timestamp = new Date().toISOString();
+            if (data) {
+                console.log(`[${timestamp}] ${message}:`, data);
+            } else {
+                console.log(`[${timestamp}] ${message}`);
+            }
+        }
+    
+        // Parse the access token from URL fragment
+        function getAccessTokenFromUrl() {
+            const fragmentString = window.location.hash.substring(1);
+            const params = new URLSearchParams(fragmentString);
             return params.get('access_token');
         }
     
-        // Check authentication and update UI
-        async function checkAuth() {
-            console.log('Checking authentication...');
-            
-            // Check URL hash for access token (from OAuth redirect)
-            const hashToken = parseHash();
-            if (hashToken) {
-                console.log('Found token in URL');
-                try {
-                    // Verify token by getting user info
-                    const userResponse = await fetch('https://api.github.com/user', {
-                        headers: {
-                            'Authorization': `token ${hashToken}`
-                        }
-                    });
-                    
-                    if (userResponse.ok) {
-                        const user = await userResponse.json();
-                        auth = { token: hashToken, user };
-                        localStorage.setItem('github-chat-auth', JSON.stringify(auth));
-                        console.log('Authentication successful:', user.login);
-                        
-                        // Clean up URL
-                        window.history.replaceState({}, document.title, window.location.pathname);
+        // Verify token by checking GitHub API
+        async function verifyToken(token) {
+            try {
+                debug('Verifying token');
+                const response = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
                     }
-                } catch (error) {
-                    console.error('Error verifying token:', error);
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    debug('Token verified, user:', user.login);
+                    return user;
+                } else {
+                    debug('Token verification failed', await response.text());
+                    return null;
                 }
-            } else {
-                // Check localStorage for existing token
-                const stored = localStorage.getItem('github-chat-auth');
-                if (stored) {
-                    auth = JSON.parse(stored);
-                    console.log('Found stored authentication');
-                }
+            } catch (error) {
+                debug('Error verifying token:', error);
+                return null;
             }
+        }
     
-            // Update UI based on auth state
-            if (auth && auth.token) {
+        // Update UI based on authentication state
+        function updateUI(isAuthenticated) {
+            debug('Updating UI, authenticated:', isAuthenticated);
+            if (isAuthenticated) {
                 document.getElementById('loginBtn').classList.add('hidden');
                 document.getElementById('logoutBtn').classList.remove('hidden');
                 document.getElementById('messageForm').classList.remove('hidden');
@@ -218,30 +218,76 @@
             }
         }
     
-        // Handle login button click
+        // Initialize authentication
+        async function initAuth() {
+            debug('Initializing authentication');
+            
+            // First check URL for access token
+            const urlToken = getAccessTokenFromUrl();
+            if (urlToken) {
+                debug('Found token in URL');
+                const user = await verifyToken(urlToken);
+                if (user) {
+                    auth = { token: urlToken, user };
+                    localStorage.setItem('github-chat-auth', JSON.stringify(auth));
+                    // Clean up URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    updateUI(true);
+                    return;
+                }
+            }
+    
+            // Then check localStorage
+            const stored = localStorage.getItem('github-chat-auth');
+            if (stored) {
+                debug('Found stored auth, verifying');
+                try {
+                    const storedAuth = JSON.parse(stored);
+                    const user = await verifyToken(storedAuth.token);
+                    if (user) {
+                        auth = storedAuth;
+                        updateUI(true);
+                        return;
+                    }
+                } catch (error) {
+                    debug('Error with stored auth:', error);
+                }
+            }
+    
+            debug('No valid authentication found');
+            localStorage.removeItem('github-chat-auth');
+            updateUI(false);
+        }
+    
+        // Handle login
         document.getElementById('loginBtn').addEventListener('click', () => {
+            debug('Initiating login');
             const redirectUri = window.location.href.split('#')[0];
-            const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=public_repo&redirect_uri=${encodeURIComponent(redirectUri)}`;
-            console.log('Redirecting to GitHub login:', authUrl);
+            const scope = 'public_repo';
+            const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=${scope}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+            debug('Redirecting to:', authUrl);
             window.location.href = authUrl;
         });
     
-        // Handle logout button click
+        // Handle logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            console.log('Logging out');
+            debug('Logging out');
             localStorage.removeItem('github-chat-auth');
             auth = null;
-            document.getElementById('loginBtn').classList.remove('hidden');
-            document.getElementById('logoutBtn').classList.add('hidden');
-            document.getElementById('messageForm').classList.add('hidden');
+            updateUI(false);
         });
     
-        // Load messages from GitHub Issue
+        // Load messages
         async function loadMessages() {
             try {
-                console.log('Loading messages...');
+                debug('Loading messages');
                 const response = await fetch(
-                    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}/comments`
+                    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}/comments`,
+                    {
+                        headers: {
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
                 );
                 
                 if (!response.ok) {
@@ -249,7 +295,7 @@
                 }
                 
                 const messages = await response.json();
-                console.log(`Loaded ${messages.length} messages`);
+                debug(`Loaded ${messages.length} messages`);
                 
                 const messagesHtml = messages.map(message => `
                     <div class="message">
@@ -274,11 +320,11 @@
                 messagesDiv.innerHTML = messagesHtml;
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             } catch (error) {
-                console.error('Error loading messages:', error);
+                debug('Error loading messages:', error);
             }
         }
     
-        // Handle message form submission
+        // Handle message submission
         document.getElementById('messageForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('messageInput');
@@ -286,7 +332,7 @@
             
             if (message && auth) {
                 try {
-                    console.log('Sending message...');
+                    debug('Sending message');
                     const response = await fetch(
                         `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}/comments`,
                         {
@@ -294,6 +340,7 @@
                             headers: {
                                 'Authorization': `token ${auth.token}`,
                                 'Content-Type': 'application/json',
+                                'Accept': 'application/vnd.github.v3+json'
                             },
                             body: JSON.stringify({ body: message })
                         }
@@ -303,17 +350,17 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     
-                    console.log('Message sent successfully');
+                    debug('Message sent successfully');
                     input.value = '';
                     loadMessages();
                 } catch (error) {
-                    console.error('Error sending message:', error);
+                    debug('Error sending message:', error);
                 }
             }
         });
     
         // Initialize
-        checkAuth();
+        initAuth();
     
         // Poll for new messages if authenticated
         setInterval(() => {
