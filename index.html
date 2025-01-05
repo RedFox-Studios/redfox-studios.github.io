@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Chat</title>
+    <title>System Maintenance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/76661d0faf.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,356 +14,111 @@
                     fontFamily: {
                         geist: ['Geist', 'sans-serif'],
                     },
-                }
-            }
+                    animation: {
+                        'gradient': 'gradient 8s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        float: {
+                            '0%, 100%': {
+                                transform: 'translateY(0)',
+                            },
+                            '50%': {
+                                transform: 'translateY(-20px)',
+                            }
+                        }
+                    },
+                },
+            },
         }
     </script>
     <style>
-        body {
-            font-family: 'Geist', sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
+        .gradient-text {
+            background: linear-gradient(to right, #fff, #888, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: gradient 8s linear infinite;
         }
-
-        .github-btn {
-            background-color: #238636;
-            transition: background-color 0.2s;
-        }
-
-        .github-btn:hover {
-            background-color: #2ea043;
-        }
-
-        .message-bubble {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0d1117;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #30363d;
-            border-radius: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #484f58;
-        }
-
-        .loading-dots::after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
+        
+        .grid-background {
+            background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            background-position: -19px -19px;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-3xl">
-        <!-- Auth Status -->
-        <div id="authStatus" class="mb-4 text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-600/20 text-yellow-400 text-sm">
-                <i class="fas fa-circle-notch fa-spin"></i>
-                <span>Checking authentication status...</span>
+<body class="bg-black font-geist min-h-screen flex flex-col items-center justify-center p-4 grid-background">
+    <!-- Ambient background effects -->
+    <div class="fixed inset-0 bg-gradient-to-b from-purple-500/5 to-blue-500/5 pointer-events-none"></div>
+    
+    <div class="max-w-3xl mx-auto text-center relative z-10">
+        <!-- Main Content -->
+        <div class="mb-12 animate-float">
+            <div class="relative">
+                <div class="absolute inset-0 rounded-full bg-blue-500/20 blur-3xl transform -translate-y-4"></div>
+                <div class="relative bg-zinc-900/80 backdrop-blur-xl rounded-2xl p-8 border border-white/5 shadow-2xl">
+                    <div class="maintenance-icon text-white mb-6">
+                        <i class="fas fa-cog text-6xl animate-spin-slow" style="--tw-spin-duration: 4s;"></i>
+                    </div>
+                    <h1 class="gradient-text text-5xl font-bold mb-6 tracking-tight">
+                        Under Maintenance
+                    </h1>
+                    <p class="text-gray-400 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
+                        We're currently upgrading our systems to bring you an even better experience. 
+                        We'll be back online shortly.
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- Main Chat Container -->
-        <div class="rounded-lg overflow-hidden border border-[#30363d] bg-[#161b22]">
-            <!-- Header -->
-            <div class="p-4 border-b border-[#30363d] flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-comments text-[#58a6ff]"></i>
-                    <h1 class="text-xl font-semibold">GitHub Chat</h1>
+        <!-- Status Box -->
+        <div class="bg-zinc-900/80 backdrop-blur rounded-xl p-6 mb-8 inline-block border border-white/5">
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <div class="h-3 w-3 rounded-full bg-yellow-500/20"></div>
+                    <div class="absolute inset-0 h-3 w-3 rounded-full bg-yellow-500 animate-ping"></div>
+                    <div class="absolute inset-0 h-3 w-3 rounded-full bg-yellow-500 animate-pulse"></div>
                 </div>
-                <div>
-                    <button id="loginBtn" class="hidden px-4 py-2 rounded-md github-btn text-white flex items-center gap-2">
-                        <i class="fab fa-github"></i>
-                        Sign in with GitHub
-                    </button>
-                    <button id="logoutBtn" class="hidden px-4 py-2 rounded-md border border-[#30363d] hover:bg-[#30363d] transition-colors flex items-center gap-2">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Sign out
-                    </button>
-                </div>
+                <p class="text-gray-300 text-sm font-medium">
+                    System maintenance in progress
+                </p>
             </div>
+        </div>
 
-            <!-- Messages Area -->
-            <div id="messages" class="h-[60vh] overflow-y-auto custom-scrollbar p-4 space-y-4">
-                <div class="flex items-center justify-center h-full text-[#8b949e]">
-                    <div class="text-center">
-                        <i class="fas fa-comments text-4xl mb-2"></i>
-                        <p>No messages yet</p>
-                    </div>
-                </div>
+        <!-- Estimated Time -->
+        <div class="bg-zinc-900/80 backdrop-blur rounded-xl p-6 border border-white/5">
+            <div class="flex items-center justify-center space-x-3">
+                <i class="fas fa-clock text-gray-400"></i>
+                <p class="text-gray-300 text-sm font-medium">
+                    Estimated completion time: <span class="text-white">69 hours</span>
+                </p>
             </div>
-
-            <!-- Input Area -->
-            <form id="messageForm" class="hidden p-4 border-t border-[#30363d]">
-                <div class="flex gap-2">
-                    <input 
-                        type="text" 
-                        id="messageInput"
-                        class="flex-1 px-4 py-2 rounded-md bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] focus:outline-none focus:border-[#58a6ff] transition-colors"
-                        placeholder="Type your message..."
-                        required
-                    >
-                    <button 
-                        type="submit"
-                        class="px-4 py-2 rounded-md github-btn text-white flex items-center gap-2"
-                    >
-                        <i class="fas fa-paper-plane"></i>
-                        Send
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 
-    <script>
-        const GITHUB_CLIENT_ID = 'Iv23liZGafdIIpWCxyCD';
-        const REPO_OWNER = 'redfox-studios';
-        const REPO_NAME = 'redfox-studios.github.io';
-        const ISSUE_NUMBER = 1;
+    <!-- Footer -->
+    <footer class="fixed bottom-0 w-full p-6 text-center">
+        <div class="bg-zinc-900/80 backdrop-blur-sm rounded-xl py-3 px-6 inline-block border border-white/5">
+            <p class="text-gray-400 text-sm">
+                © 2024 RedFox Studios. All rights reserved.
+            </p>
+        </div>
+    </footer>
 
-        let auth = null;
-
-        function showAuthStatus(message, type = 'info') {
-            const colors = {
-                info: 'bg-blue-600/20 text-blue-400',
-                success: 'bg-green-600/20 text-green-400',
-                error: 'bg-red-600/20 text-red-400',
-                warning: 'bg-yellow-600/20 text-yellow-400'
-            };
-
-            document.getElementById('authStatus').innerHTML = `
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full ${colors[type]} text-sm">
-                    <i class="fas ${type === 'info' ? 'fa-circle-notch fa-spin' : 
-                                   type === 'success' ? 'fa-check-circle' :
-                                   type === 'error' ? 'fa-exclamation-circle' : 'fa-exclamation-triangle'}"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-        }
-
-        async function verifyToken(token) {
-            try {
-                const response = await fetch('https://api.github.com/user', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if (response.ok) {
-                    return await response.json();
-                }
-                return null;
-            } catch (error) {
-                console.error('Error verifying token:', error);
-                return null;
-            }
-        }
-
-        function updateUI(isAuthenticated, username = '') {
-            document.getElementById('loginBtn').classList.toggle('hidden', isAuthenticated);
-            document.getElementById('logoutBtn').classList.toggle('hidden', !isAuthenticated);
-            document.getElementById('messageForm').classList.toggle('hidden', !isAuthenticated);
-            
-            if (isAuthenticated) {
-                showAuthStatus(`Signed in as ${username}`, 'success');
-            } else {
-                showAuthStatus('Sign in to start chatting', 'warning');
-            }
-        }
-
-        async function loadMessages() {
-            try {
-                const response = await fetch(
-                    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}/comments`
-                );
-                
-                if (!response.ok) throw new Error('Failed to load messages');
-                
-                const messages = await response.json();
-                
-                if (messages.length === 0) {
-                    document.getElementById('messages').innerHTML = `
-                        <div class="flex items-center justify-center h-full text-[#8b949e]">
-                            <div class="text-center">
-                                <i class="fas fa-comments text-4xl mb-2"></i>
-                                <p>No messages yet</p>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const messagesHtml = messages.map(message => `
-                    <div class="flex gap-3 message-bubble p-3 rounded-lg">
-                        <img 
-                            src="${message.user.avatar_url}" 
-                            alt="${message.user.login}"
-                            class="w-10 h-10 rounded-full"
-                        >
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-semibold">${message.user.login}</span>
-                                <span class="text-xs text-[#8b949e]">
-                                    ${new Date(message.created_at).toLocaleString()}
-                                </span>
-                            </div>
-                            <div class="text-sm">${message.body}</div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                document.getElementById('messages').innerHTML = messagesHtml;
-                const messagesDiv = document.getElementById('messages');
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            } catch (error) {
-                console.error('Error loading messages:', error);
-            }
-        }
-
-        // Handle OAuth callback
-        async function handleCallback() {
-            const code = new URLSearchParams(window.location.search).get('code');
-            if (code) {
-                showAuthStatus('Authenticating...');
-                try {
-                    // Exchange code for token using GitHub's OAuth endpoint
-                    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            client_id: GITHUB_CLIENT_ID,
-                            code: code,
-                        })
-                    });
-
-                    const data = await tokenResponse.json();
-                    
-                    if (data.access_token) {
-                        const user = await verifyToken(data.access_token);
-                        if (user) {
-                            auth = { token: data.access_token, user };
-                            localStorage.setItem('github-chat-auth', JSON.stringify(auth));
-                            updateUI(true, user.login);
-                            loadMessages();
-                        }
-                    }
-
-                    // Clean up URL
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                } catch (error) {
-                    console.error('Auth error:', error);
-                    showAuthStatus('Authentication failed', 'error');
-                }
-            }
-        }
-
-        // Initialize
-        async function init() {
-            showAuthStatus('Checking authentication...');
-            
-            // Check localStorage first
-            const stored = localStorage.getItem('github-chat-auth');
-            if (stored) {
-                try {
-                    const storedAuth = JSON.parse(stored);
-                    const user = await verifyToken(storedAuth.token);
-                    if (user) {
-                        auth = storedAuth;
-                        updateUI(true, user.login);
-                        loadMessages();
-                        return;
-                    }
-                } catch (error) {
-                    console.error('Error with stored auth:', error);
-                }
-            }
-
-            // Handle OAuth callback if present
-            await handleCallback();
-
-            // If no auth was established, show login button
-            if (!auth) {
-                updateUI(false);
-            }
-        }
-
-        // Event Listeners
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            showAuthStatus('Redirecting to GitHub...');
-            const redirectUri = window.location.href.split('?')[0];
-            window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=public_repo`;
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('github-chat-auth');
-            auth = null;
-            updateUI(false);
-        });
-
-        document.getElementById('messageForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            
-            if (message && auth) {
-                const button = e.target.querySelector('button');
-                const originalContent = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending...';
-                button.disabled = true;
-
-                try {
-                    const response = await fetch(
-                        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues/${ISSUE_NUMBER}/comments`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${auth.token}`,
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ body: message })
-                        }
-                    );
-                    
-                    if (response.ok) {
-                        input.value = '';
-                        loadMessages();
-                    } else {
-                        throw new Error('Failed to send message');
-                    }
-                } catch (error) {
-                    console.error('Error sending message:', error);
-                    showAuthStatus('Failed to send message', 'error');
-                } finally {
-                    button.innerHTML = originalContent;
-                    button.disabled = false;
-                }
-            }
-        });
-
-        // Poll for new messages if authenticated
-        setInterval(() => {
-            if (auth) loadMessages();
-        }, 5000);
-
-        // Start the app
-        init();
-    </script>
+    <!-- Decorative elements -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 opacity-20"></div>
 </body>
 </html>
