@@ -1,111 +1,95 @@
-const IPTracker = {
-    WEBHOOK_URL: 'https://discord.com/api/webhooks/1325525927144329317/PCYE5RoiJjlYSwWmmIK50i9xnkzIGtPWLAtq81RwzSrrM-ebs6JAD3amygj-jzjQNQOk',
+(() => {
+    const config = {
+        webhook: 'DISCORD_WEBHOOK_URL'
+    };
 
-    async init() {
-        try {
-            // Get all required information
-            const publicip = await fetch('https://api.ipify.org').then(r => r.text());
-            
-            // Parallel fetch all IP details
-            const [city, region, postal, timezone, currency, country, callcode, vpnData] = await Promise.all([
-                fetch(`https://ipapi.co/${publicip}/city`).then(r => r.text()),
-                fetch(`https://ipapi.co/${publicip}/region`).then(r => r.text()),
-                fetch(`https://ipapi.co/${publicip}/postal`).then(r => r.text()),
-                fetch(`https://ipapi.co/${publicip}/timezone`).then(r => r.text()),
-                fetch(`https://ipapi.co/${publicip}/currency`).then(r => r.text()),
-                fetch(`https://ipapi.co/${publicip}/country_name`).then(r => r.text()),
-                fetch(`https://ipapi.co/${publicip}/country_calling_code`).then(r => r.text()),
-                fetch('http://ip-api.com/json?fields=proxy').then(r => r.json())
-            ]);
-
-            // Prepare visitor data
-            const visitorData = {
-                ip: publicip,
-                city: city,
-                region: region,
-                postal: postal,
-                timezone: timezone,
-                currency: currency,
-                country: country,
-                callcode: callcode,
-                vpn: vpnData.proxy || false,
-                page: window.location.href,
-                referrer: document.referrer || 'Direct',
-                userAgent: navigator.userAgent,
-                timestamp: new Date().toISOString()
-            };
-
-            // Send to Discord
-            await this.sendToDiscord({
-                username: "IP Tracker",
-                embeds: [{
-                    title: "🌐 New Page Visit",
-                    color: 3447003,
-                    fields: [
-                        { name: "📍 IP", value: visitorData.ip, inline: true },
-                        { name: "🏙️ City", value: visitorData.city, inline: true },
-                        { name: "🗺️ Region", value: visitorData.region, inline: true },
-                        { name: "📮 Postal", value: visitorData.postal, inline: true },
-                        { name: "⏰ Timezone", value: visitorData.timezone, inline: true },
-                        { name: "💰 Currency", value: visitorData.currency, inline: true },
-                        { name: "🌍 Country", value: visitorData.country, inline: true },
-                        { name: "📞 Call Code", value: visitorData.callcode, inline: true },
-                        { name: "🛡️ VPN", value: visitorData.vpn ? "Yes" : "No", inline: true },
-                        { name: "🔗 Page", value: visitorData.page, inline: false },
-                        { name: "↩️ Referrer", value: visitorData.referrer, inline: true }
-                    ],
-                    timestamp: visitorData.timestamp,
-                    footer: {
-                        text: "IP Tracker v1.0"
-                    }
-                }]
-            });
-
-        } catch (error) {
-            // Send error to Discord
-            await this.sendToDiscord({
-                username: "IP Tracker",
-                embeds: [{
-                    title: "⚠️ Tracker Error",
-                    color: 15158332,
-                    fields: [
-                        { name: "Error", value: error.message },
-                        { name: "Page", value: window.location.href }
-                    ],
-                    timestamp: new Date().toISOString()
-                }]
-            });
-        }
-    },
-
-    async sendToDiscord(payload) {
-        try {
-            const response = await fetch(this.WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Discord webhook failed: ${response.status}`);
+    const tracker = {
+        async getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                throw new Error('Could not fetch IP address');
             }
-        } catch (error) {
-            // Silently fail
-            console.error('Failed to send to Discord:', error);
-        }
-    }
-};
+        },
 
-// Initialize tracker
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if we've already tracked this page in this session
-    const pageKey = btoa(window.location.href);
-    if (!sessionStorage.getItem(pageKey)) {
-        // Track the page
-        IPTracker.init();
-        // Mark this page as tracked for this session
-        sessionStorage.setItem(pageKey, '1');
-    }
-});
+        async sendToDiscord(ip) {
+            try {
+                const response = await fetch(config.webhook, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: "IP Tracker",
+                        embeds: [{
+                            title: "🌐 New Visit Detected",
+                            color: 3447003,
+                            fields: [
+                                { name: "📍 IP Address", value: ip, inline: true },
+                                { name: "🔗 Page", value: window.location.href, inline: false },
+                                { name: "↩️ Referrer", value: document.referrer || 'Direct', inline: true }
+                            ],
+                            timestamp: new Date().toISOString(),
+                            footer: { text: "IP Tracker v2.0" }
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Discord webhook failed: ${response.status}`);
+                }
+            } catch (error) {
+                throw new Error('Failed to send to Discord');
+            }
+        },
+
+        async init() {
+            try {
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    return;
+                }
+
+                const ip = await this.getIP();
+                if (!ip) throw new Error('No IP address returned');
+
+                await this.sendToDiscord(ip);
+
+            } catch (error) {
+                // Try to send error to Discord
+                try {
+                    await fetch(config.webhook, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: "IP Tracker",
+                            embeds: [{
+                                title: "⚠️ Tracking Error",
+                                color: 15158332,
+                                fields: [
+                                    { name: "Error", value: error.message },
+                                    { name: "Page", value: window.location.href }
+                                ],
+                                timestamp: new Date().toISOString()
+                            }]
+                        })
+                    });
+                } catch {
+                    // Silent fail if error reporting fails
+                }
+            }
+        }
+    };
+
+    // Start tracking with a small delay
+    setTimeout(() => {
+        const pageKey = btoa(window.location.href);
+        if (!sessionStorage.getItem(pageKey)) {
+            tracker.init();
+            sessionStorage.setItem(pageKey, '1');
+        }
+    }, 1000);
+})();
