@@ -1,7 +1,7 @@
 // discordWebhook.js
 // This file handles sending data to Discord via webhook
 
-// Replace with your Discord webhook URL
+// Discord webhook URL
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1325525927144329317/PCYE5RoiJjlYSwWmmIK50i9xnkzIGtPWLAtq81RwzSrrM-ebs6JAD3amygj-jzjQNQOk';
 
 export async function sendToDiscord(username) {
