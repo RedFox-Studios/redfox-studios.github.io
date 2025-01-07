@@ -55,4 +55,3 @@ export async function sendToDiscord(username) {
         throw new Error('Failed to send request to Discord');
     }
 }
-

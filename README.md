@@ -1,128 +1,158 @@
 # GitHub Organization Request Page
 
-A modern, interactive web page for GitHub Pages that allows users to request access to your GitHub organization. Features a sleek dark theme design with animated particles and Discord webhook integration.
+A modern, interactive web application that allows users to request access to a GitHub organization. Built with vanilla JavaScript and TailwindCSS, featuring a sleek dark theme design inspired by shadcn and Vercel.
 
-![Preview of the application](./preview.png)
+![Preview](preview.png)
 
-## ✨ Features
+## 🌟 Features
 
-- **Modern UI/UX**: Clean, dark-themed interface with glass morphism effects
-- **Interactive Elements**: Animated particles and interactive GitHub icon
-- **Form Validation**: Real-time GitHub username validation
-- **Discord Integration**: Automatic notifications via Discord webhook
-- **Custom 404 Page**: Styled error page matching the main theme
-- **Responsive Design**: Works seamlessly on all device sizes
-- **Animations**: Smooth transitions and loading states
+- **Modern UI/UX**: Sleek dark theme with glass morphism effects
+- **Interactive Elements**: Dynamic particle system and animations
+- **Form Validation**: Real-time GitHub username verification
+- **Discord Integration**: Automatic notifications via webhook
+- **Responsive Design**: Optimized for all device sizes
+- **SEO Optimized**: Complete metadata implementation
 
 ## 🔄 How It Works
 
 ```mermaid
 graph TD
     A["User Visits Page"] --> B["Enter GitHub Username"]
-    B --> C["Form Submission"]
-    C --> D["GitHub API Check"]
-    D -->|"Valid Username"| E["Discord Webhook"]
-    D -->|"Invalid Username"| F["Show Error"]
-    E --> G["Success Message"]
-    G --> H["Particle Animation"]
-    
-    subgraph "Background Processes"
-        I["Particle System"] --> J["Continuous Animation"]
-        J --> K["Interactive Effects"]
+    B --> C{"Validate Username"}
+    C -->|"Valid"| D["Send Discord Notification"]
+    C -->|"Invalid"| E["Show Error Message"]
+    D --> F["Show Success Message"]
+    D --> G["Discord Webhook"]
+    G --> H["Organization Admin\nReceives Notification"]
+
+    subgraph "Frontend Components"
+        A
+        B
+        E
+        F
     end
 
-    subgraph "Discord Integration"
-        E --> L["Fetch User Data"]
-        L --> M["Create Embed"]
-        M --> N["Send to Discord"]
+    subgraph "Backend Processing"
+        C
+        D
+        G
     end
+
+    subgraph "Admin Actions"
+        H
+    end
+
+    style A fill:#2d333b,color:#fff
+    style B fill:#2d333b,color:#fff
+    style C fill:#3a404a,color:#fff
+    style D fill:#3a404a,color:#fff
+    style E fill:#2d333b,color:#fff
+    style F fill:#2d333b,color:#fff
+    style G fill:#3a404a,color:#fff
+    style H fill:#2d333b,color:#fff
 ```
 
-The diagram above illustrates the application's flow:
-1. Users enter their GitHub username
-2. The system validates the username through GitHub's API
-3. If valid, it sends the request to Discord with user information
-4. The background particle system provides continuous interactive animations
-5. Success/error messages are displayed accordingly
+
+## 📁 Project Structure
+
+```plaintext
+root/
+├── index.html          # Main entry point
+├── 404.html            # Custom error page
+├── favicon.ico         # Site favicon
+├── preview.png         # Social preview image
+├── robots.txt          # Search engine configuration
+├── sitemap.xml         # Site structure for SEO
+└── js/
+    ├── main.js             # Application initialization
+    ├── particleSystem.js   # Background animation
+    ├── formHandler.js      # Form processing
+    └── discordWebhook.js   # Discord integration
+```
 
 ## 🚀 Setup
 
-1. **Clone this repository**
-    ```bash
-    git clone https://github.com/yourusername/organization-request-page.git
-    cd organization-request-page
-    ```
+1. Clone the repository:
 
-2. **Configure Discord Webhook**
+```shellscript
+git clone https://github.com/RedFox-Studios/redfox-studios.github.io.git
+cd redfox-studios.github.io
+```
 
-1. Open `discordWebhook.js`
-2. Replace `YOUR_DISCORD_WEBHOOK_URL` with your actual Discord webhook URL
+2. Configure Discord webhook:
+   - Open `js/discordWebhook.js`
+   - Replace `YOUR_DISCORD_WEBHOOK_URL` with your actual Discord webhook URL
 
 
-
-3. **Deploy to GitHub Pages**
-
-1. Go to your repository settings
-2. Navigate to the "Pages" section
-3. Select your branch (usually `main`) as the source
-4. Your site will be available at `https://yourusername.github.io/`
-
-## 🛠️ Technologies Used
-
-- HTML5 & CSS3
-- JavaScript (ES6+)
-- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
-- [Font Awesome](https://fontawesome.com) - Icons
-- [Geist Font](https://vercel.com/font) - Typography
-- Discord Webhooks API
+3. Deploy to GitHub Pages:
+   - Go to repository settings
+   - Navigate to "Pages"
+   - Select your branch (usually `main`)
+   - Save to deploy
 
 
 ## ⚙️ Configuration
 
-### Discord Webhook Setup
+### Discord Webhook
 
-1. In your Discord server:
-   - Go to Server Settings > Integrations
-   - Click on "Create Webhook"
-   - Choose the channel for notifications
-   - Copy the webhook URL
+The application sends notifications to Discord when users request access. To configure:
 
-2. In your code:
-   - Open `discordWebhook.js`
-   - Replace the placeholder URL:
+1. Create a Discord webhook in your server
+2. Copy the webhook URL
+3. Update the `DISCORD_WEBHOOK_URL` in `js/discordWebhook.js`
 
 
-```javascript
-const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL';
+### SEO Configuration
+
+Update the metadata in `index.html` with your information:
+
+```html
+<meta property="og:url" content="https://redfox-studios.github.io/">
+<meta property="og:title" content="Your Title">
+<meta property="og:description" content="Your Description">
 ```
 
+## 🎨 Customization
 
-### Custom Domain (Optional)
+### Colors
 
-To use a custom domain:
+The project uses TailwindCSS for styling. Main colors are:
 
-1. Add a CNAME file to your repository
-2. Configure your domain's DNS settings
-3. Update your repository's GitHub Pages settings
+- Background: Zinc-900 to Zinc-800 gradient
+- Text: Zinc-100 to Zinc-400
+- Accents: Various opacity levels of Zinc
+
+
+### Fonts
+
+- Main Font: Geist
+- Monospace: Geist Mono
+- Icons: Font Awesome
+
+
+## 📱 Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+2. Create your feature branch: `git checkout -b feature/AmazingFeature`
+3. Commit your changes: `git commit -m 'Add some AmazingFeature'`
+4. Push to the branch: `git push origin feature/AmazingFeature`
+5. Open a pull request
 
 
-## 📝 License
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- Design inspired by [Vercel](https://vercel.com) and [shadcn/ui](https://ui.shadcn.com)
-- Particle animation system adapted from various open-source implementations
-- Thanks to the GitHub Pages team for the hosting platform
+- [TailwindCSS](https://tailwindcss.com)
+- [Font Awesome](https://fontawesome.com)
+- [Geist Font](https://vercel.com/font)

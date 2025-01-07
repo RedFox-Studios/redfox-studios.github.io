@@ -1,4 +1,4 @@
-// main.js
+// js/main.js
 // This is the main entry point for our application
 
 import { initParticleSystem } from './particleSystem.js';
@@ -11,4 +11,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the form handler
     initFormHandler();
 });
-

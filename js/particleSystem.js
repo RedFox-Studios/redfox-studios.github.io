@@ -57,4 +57,3 @@ function createParticle() {
 
     return { particle, animation };
 }
-
