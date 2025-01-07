@@ -3,10 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Maintenance</title>
-    <script src="tracker.js" defer></script>
+    <title>GitHub Organization Request</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/76661d0faf.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'geist': ['Geist', 'sans-serif'],
+                        'geist-mono': ['Geist Mono', 'monospace'],
+                    },
+                    animation: {
+                        'gradient': 'gradient 15s ease infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': {
+                                'background-position': '0% 50%'
+                            },
+                            '50%': {
+                                'background-position': '100% 50%'
+                            },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Geist', sans-serif;
+        }
+        .glass {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .animate-in {
+            animation: animate-in 0.5s ease-out;
+        }
+        @keyframes animate-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .glow {
+            box-shadow: 0 0 15px theme('colors.zinc.500');
+        }
+        .hover-glow:hover {
+            box-shadow: 0 0 20px theme('colors.zinc.400');
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+    </style>
 </head>
-<body>
-    <h1>Site Under Maintenance</h1>
+<body class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 bg-[length:400%_400%] animate-gradient relative overflow-hidden">
+    <!-- Animated Background Elements -->
+    <div id="particles-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+
+    <!-- Main Content -->
+    <div class="w-full max-w-md animate-in relative z-10">
+        <!-- Card Container -->
+        <div class="glass rounded-2xl shadow-2xl shadow-zinc-950/50 border border-zinc-700/50 overflow-hidden transition-all duration-300 hover:border-zinc-600/50 hover-glow">
+            <!-- GitHub Icon Header -->
+            <div class="pt-8 pb-6 flex justify-center">
+                <div id="github-icon" class="h-24 w-24 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center shadow-xl glow transition-all duration-300 hover:scale-105 cursor-pointer">
+                    <i class="fab fa-github text-5xl text-zinc-100"></i>
+                </div>
+            </div>
+
+            <div class="px-8 pb-8 space-y-6">
+                <!-- Header -->
+                <div class="space-y-2 text-center">
+                    <h1 class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 bg-clip-text text-transparent">Join Organization</h1>
+                    <p class="text-zinc-400">Enter your GitHub username to request access</p>
+                </div>
+
+                <!-- Form -->
+                <form id="githubForm" class="space-y-4">
+                    <div class="space-y-2">
+                        <label for="username" class="text-sm font-medium text-zinc-300 block">GitHub Username</label>
+                        <div class="relative group">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-200 transition-colors duration-300">
+                                <i class="fab fa-github"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="w-full px-10 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg text-zinc-100 font-geist-mono focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:border-transparent placeholder-zinc-500 transition-all duration-300"
+                                placeholder="username"
+                                required
+                            >
+                        </div>
+                        <p id="error-message" class="text-red-400 text-sm hidden"></p>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        id="submit-button"
+                        class="w-full py-3 px-4 bg-gradient-to-r from-zinc-100 to-zinc-200 hover:from-zinc-200 hover:to-zinc-300 active:from-zinc-300 active:to-zinc-400 text-zinc-900 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-zinc-950/20 hover:shadow-xl hover:shadow-zinc-950/30"
+                    >
+                        <span>Submit Request</span>
+                        <div id="loading-spinner" class="hidden">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                        </div>
+                    </button>
+                </form>
+
+                <!-- Success Message -->
+                <div id="success-message" class="hidden text-center space-y-4 animate-in">
+                    <div class="text-green-400">
+                        <i class="fas fa-check-circle text-6xl"></i>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-2xl font-semibold text-zinc-100">Request Submitted</h3>
+                        <p class="text-zinc-400">Your request has been sent successfully.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-zinc-500 text-sm animate-in">
+            <p>Powered by GitHub Pages</p>
+        </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
 </body>
 </html>
+
