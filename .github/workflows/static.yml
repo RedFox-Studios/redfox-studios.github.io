@@ -1,7 +1,5 @@
 name: Deploy static content to Pages
 
-permalink: /404.html
-
 on:
   push:
     branches: ["main"]
